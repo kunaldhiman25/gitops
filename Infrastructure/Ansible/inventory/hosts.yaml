@@ -1,0 +1,12 @@
+all:
+  hosts:
+    myserver:
+      ansible_host: "{{ lookup('file', '../public-ip.txt') }}"
+      ansible_user: adminuser
+      ansible_password: password@123
+    
+    dbserver:
+      ansible_host: 10.0.3.4
+      ansible_user: adminuser
+      ansible_ssh_common_args: "-o ProxyCommand='sshpass -p 'your_bastion_password' ssh -W %h:%p adminuser@{{ lookup('file', '../public-ip.txt') }} -p 22'"
+      ansible_password: password@123

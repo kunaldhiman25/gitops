@@ -1,0 +1,90 @@
+- name: Application Setup
+  hosts: myserver
+  become: yes
+
+  tasks:
+    - name: Add Ondřej Surý's PHP PPA
+      apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+        update_cache: yes
+
+    - name: Installing Php
+      package:
+         name: "{{item}}"
+         state: present
+         update_cache: yes
+      loop:
+        - php7.4
+        - php7.4-cli
+        - php7.4-fpm
+        - php7.4-mysql
+        - sshpass
+      notify: 
+        - Copy php.ini file
+      
+    - name: Install apache2
+      package:
+        name: apache2
+        state: present
+        update_cache: yes
+      notify:
+        - Enable Apache2 service
+        - Copy apache configuration file  
+
+    - name: Creates directory
+      ansible.builtin.file:
+        path: /var/www/html/Employee-management
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: 0775
+      notify:
+        - Copy file with owner and permissions
+        - Copy apache configuration file
+        - Reload apache
+
+    - name: Reload apache
+      service:
+        name: apache2
+        state: reloaded
+
+#---------------------------------------- HANDLERS -------------------------------------------
+
+  handlers:
+    - name: Copy php.ini file
+      ansible.builtin.copy:
+        src: /home/kunaldhiman/important/Configurations-and-Policies/php.ini
+        dest: /etc/php/7.4/apache2/
+        owner: root
+        group: root
+        mode: '0644'
+        force: yes
+
+    - name: Copy apache configuration file
+      ansible.builtin.copy:
+        src: /home/kunaldhiman/important/Configurations-and-Policies/000-default.conf
+        dest: /etc/apache2/sites-available/
+        owner: root
+        group: root
+        mode: '0644'
+        force: yes
+
+    - name: Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: /home/kunaldhiman/important/Application/
+        dest: /var/www/html/Employee-management
+        owner: www-data
+        group: www-data
+        mode: '0644'
+        force: yes
+
+    - name: Enable Apache2 service
+      service:
+        name: apache2
+        state: started
+
+    - name: Reload apache
+      service:
+        name: apache2
+        state: reloaded
