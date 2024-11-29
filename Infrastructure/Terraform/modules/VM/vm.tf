@@ -7,6 +7,10 @@ variable "prefix" {
 resource "azurerm_resource_group" "resource_group" {
   name     = var.resource_group_name
   location = var.resource_group_location
+
+  tags = {
+    environment = var.environment
+  }
 }
 
 # ----------------- Resource Lock on the Resource Group -----------------
@@ -40,13 +44,14 @@ resource "azurerm_virtual_machine" "vm" {
     version   = "latest"
   }
   storage_os_disk {
-    name              = "myosdisk1"
+    name              = "${var.vm-name}-disk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
-  }
+
+    }
   os_profile {
-    computer_name  = "hostname"
+    computer_name  = var.hostname
     admin_username = "testadmin"
     admin_password = "Password1234!"
   }
@@ -54,6 +59,6 @@ resource "azurerm_virtual_machine" "vm" {
     disable_password_authentication = false
   }
   tags = {
-    environment = "staging"
+    environment = var.environment
   }
 }

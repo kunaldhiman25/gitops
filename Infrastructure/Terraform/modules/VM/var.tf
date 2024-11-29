@@ -7,6 +7,14 @@ variable "resource_group_location" {
     type = string  
 }
 
+variable "environment" {
+    type = string  
+}
+
 variable "vm-name" {
     type = string  
+}
+
+variable "hostname" {
+    type = string
 }
