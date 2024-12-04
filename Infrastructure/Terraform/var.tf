@@ -1,14 +1,20 @@
 variable "resource_group_name" {
     type = string 
-    default = "recource-group"
+    default = "test"
 }
 
 variable "resource_group_location" {
     type = string  
-    default = "brazilus"
+}
+
+variable "environment" {
+    type = string  
 }
 
 variable "vm-name" {
-    type = string 
-    default = "vm-name"
+    type = string  
+}
+
+variable "hostname" {
+    type = string
 }

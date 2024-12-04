@@ -28,7 +28,7 @@ resource "azurerm_virtual_machine" "vm" {
   name                  = var.vm-name
   location              = azurerm_resource_group.resource_group.location
   resource_group_name   = azurerm_resource_group.resource_group.name
-  network_interface_ids = [azurerm_network_interface.network-interface.id]
+  network_interface_ids = [azurerm_network_interface.network_interface.id]
   vm_size               = "Standard_DS1_v2"
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
@@ -56,9 +56,11 @@ resource "azurerm_virtual_machine" "vm" {
     admin_password = "Password1234!"
   }
   os_profile_linux_config {
-    disable_password_authentication = false
+    disable_password_authentication = true
   }
   tags = {
     environment = var.environment
   }
+
 }
+
