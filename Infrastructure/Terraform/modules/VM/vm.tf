@@ -14,53 +14,40 @@ resource "azurerm_resource_group" "resource_group" {
 }
 
 # ----------------- Resource Lock on the Resource Group -----------------
-
+/*
 resource "azurerm_management_lock" "resource-group-level" {
   name       = "resource-group-level-lock"
   scope      = azurerm_resource_group.resource_group.id
   lock_level = "ReadOnly"
   notes      = "This Resource Group is Read-Only"
 }
-
+*/
 # ----------------- Virtual Machine -----------------
 
-resource "azurerm_virtual_machine" "vm" {
-  name                  = var.vm-name
-  location              = azurerm_resource_group.resource_group.location
-  resource_group_name   = azurerm_resource_group.resource_group.name
-  network_interface_ids = [azurerm_network_interface.network_interface.id]
-  vm_size               = "Standard_DS1_v2"
+resource "azurerm_linux_virtual_machine" "vm" {
+  name                = var.vm_name
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  size                = "Standard_F2"
+  admin_username      = "adminuser"
+  network_interface_ids = [
+    azurerm_network_interface.network_interface.id,
+  ]
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
-  # delete_os_disk_on_termination = true
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/azurekey.pub")
+  }
 
-  # Uncomment this line to delete the data disks automatically when deleting the VM
-  # delete_data_disks_on_termination = true
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts"
     version   = "latest"
   }
-  storage_os_disk {
-    name              = "${var.vm-name}-disk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-
-    }
-  os_profile {
-    computer_name  = var.hostname
-    admin_username = "testadmin"
-    admin_password = "Password1234!"
-  }
-  os_profile_linux_config {
-    disable_password_authentication = true
-  }
-  tags = {
-    environment = var.environment
-  }
-
 }
-

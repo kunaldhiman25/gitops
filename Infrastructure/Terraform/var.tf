@@ -11,7 +11,7 @@ variable "environment" {
     type = string  
 }
 
-variable "vm-name" {
+variable "vm_name" {
     type = string  
 }
 
